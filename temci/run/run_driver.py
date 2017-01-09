@@ -754,23 +754,28 @@ class PerfStatExecRunner(ExecRunner):
                      res: BenchmarkingResultBlock = None) -> BenchmarkingResultBlock:
         res = res or BenchmarkingResultBlock()
         m = {"__ov-time": exec_res.time}
-        props = self.misc["properties"]  # type: t.List[str]
+
+        def normalize_name(prop):
+            match = re.search('name=([^,/]+)', prop)
+            if match is not None:
+                return match.group(1)
+            return prop
+
+        props = [normalize_name(p) for p in self.misc["properties"]]  # type: t.List[str]
         has_wall_clock = "wall-clock" in props
         if has_wall_clock:
             props = props.copy()
             props.remove("wall-clock")
             props.append("wall-clock")
+
         missing_props = len(props)
         for line in reversed(exec_res.stderr.strip().split("\n")):
             if missing_props == 0:
                 break
-            if ',' in line or ';' in line or "." in line:
+            prop = props[missing_props - 1]
+            if ',' in line or ';' in line or "." in line or prop in line:
                 try:
                     line = line.strip()
-                    prop = props[missing_props - 1]
-                    match = re.search('name=([^,/]+))', prop)
-                    if match is not None:
-                        prop = match.group(1)
                     assert prop in line or prop == "wall-clock"
                     val = ""  # type: str
                     if ";" in line:  # csv output with separator ';'
