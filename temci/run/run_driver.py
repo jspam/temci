@@ -797,6 +797,7 @@ class FirmTimeRunner(PerfStatExecRunner):
     def setup_block(self, block: RunProgramBlock, cpuset: CPUSet = None, set_id: int = 0):
         if not any("--time" in run_cmd for run_cmd in block["run_cmds"]):
             raise KeyboardInterrupt("None of the executed commands contains the --time parameter. This is probably an error.")
+        super().setup_block(block, cpuset, set_id)
 
     def parse_result(self, exec_res: ExecRunDriver.ExecResult,
                      res: BenchmarkingResultBlock = None) -> BenchmarkingResultBlock:
