@@ -781,6 +781,34 @@ class PerfStatExecRunner(ExecRunner):
         res.add_run_data(m)
         return res
 
+@ExecRunDriver.register_runner()
+class FirmTimeRunner(PerfStatExecRunner):
+    """
+    Runner that uses ``perf stat`` for measurements.
+    """
+
+    name = "firm_time"
+
+    def setup_block(self, block: RunProgramBlock, cpuset: CPUSet = None, set_id: int = 0):
+        if not any("--time" in run_cmd for run_cmd in block["run_cmds"]):
+            raise KeyboardInterrupt("None of the executed commands contains the --time parameter. This is probably an error.")
+
+    def parse_result(self, exec_res: ExecRunDriver.ExecResult,
+                     res: BenchmarkingResultBlock = None) -> BenchmarkingResultBlock:
+        res = super().parse_result(exec_res, res)
+        m = {}
+        for line in reversed(exec_res.stderr.strip().split('\n')):
+            l_split = line.split()
+            if len(l_split) > 2 and l_split[-1] == 'msec':
+                try:
+                    the_phase = " ".join(l_split[:-2])
+                    the_time = float(l_split[-2])
+                    m[the_phase] = the_time
+                except ValueError:
+                    continue
+        res.add_run_data(m)
+        return res
+
 
 def get_av_rusage_properties() -> t.Dict[str, str]:
     """
