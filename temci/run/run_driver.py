@@ -18,7 +18,7 @@ from ..utils.registry import AbstractRegistry, register
 from .cpuset import CPUSet
 from copy import deepcopy
 import logging, time, random, subprocess
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import gc
 import typing as t
 import traceback
@@ -801,14 +801,14 @@ class FirmTimeRunner(PerfStatExecRunner):
     def parse_result(self, exec_res: ExecRunDriver.ExecResult,
                      res: BenchmarkingResultBlock = None) -> BenchmarkingResultBlock:
         res = super().parse_result(exec_res, res)
-        m = {}
+        m = defaultdict(float)
         for line in reversed(exec_res.stderr.strip().split('\n')):
             l_split = line.split()
             if len(l_split) > 2 and l_split[-1] == 'msec':
                 try:
                     the_phase = " ".join(l_split[:-2])
                     the_time = float(l_split[-2])
-                    m[the_phase] = the_time
+                    m[the_phase] += the_time
                 except ValueError:
                     continue
         res.add_run_data(m)
