@@ -766,6 +766,9 @@ class PerfStatExecRunner(ExecRunner):
                 try:
                     line = line.strip()
                     prop = props[missing_props - 1]
+                    match = re.search('name=([^,/]+))', prop)
+                    if match is not None:
+                        prop = match.group(1)
                     assert prop in line or prop == "wall-clock"
                     val = ""  # type: str
                     if ";" in line:  # csv output with separator ';'
