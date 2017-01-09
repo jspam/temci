@@ -501,6 +501,7 @@ class ExecRunDriver(AbstractRunDriver):
         executed_cmd = "; ".join(executed_cmd)
         proc = None
         try:
+            print("{}Executing: {}".format(os.linesep, executed_cmd))
             proc = subprocess.Popen(["/bin/sh", "-c", executed_cmd], stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     universal_newlines=True,
@@ -509,6 +510,7 @@ class ExecRunDriver(AbstractRunDriver):
             # preexec_fn=os.setsid)
             out, err = proc.communicate()
             t = time.time() - t
+            print("Elapsed: {}", t)
             ExecValidator(block["validator"]).validate(cmd, out, err, proc.poll())
             # if proc.poll() > 0:
             #    msg = "Error executing " + cmd + ": "+ str(err) + " " + str(out)
