@@ -21,6 +21,7 @@ import logging, time, random, subprocess
 from collections import namedtuple
 import gc
 import typing as t
+import traceback
 
 Number = t.Union[int, float]
 """ Numeric value """
@@ -438,16 +439,19 @@ class ExecRunDriver(AbstractRunDriver):
             gc.collect()
             gc.disable()
         except IOError as err:
+            traceback.print_exc()
             return BenchmarkingResultBlock(error=err)
         try:
             res = self._benchmark(block, runs, cpuset, set_id)
         except BaseException as ex:
+            traceback.print_exc()
             return BenchmarkingResultBlock(error=ex)
         finally:
             gc.enable()
         try:
             self._teardown_block(block)
         except BaseException as err:
+            traceback.print_exc()
             return BenchmarkingResultBlock(error=err)
         t = time.time() - t
         assert isinstance(res, BenchmarkingResultBlock)
