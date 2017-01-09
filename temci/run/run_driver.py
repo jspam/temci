@@ -783,7 +783,7 @@ class PerfStatExecRunner(ExecRunner):
                     else:
                         val = line.split(" ")[0]
                     val = val.replace(",", "")
-                    m[prop] = float(val) if "." in val else int(val)
+                    m["perf-" + prop] = float(val) if "." in val else int(val)
                     missing_props -= 1
                 except BaseException as ex:
                     #logging.error(ex)
