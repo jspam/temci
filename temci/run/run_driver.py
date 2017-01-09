@@ -510,7 +510,7 @@ class ExecRunDriver(AbstractRunDriver):
             # preexec_fn=os.setsid)
             out, err = proc.communicate()
             t = time.time() - t
-            print("Elapsed: {}", t)
+            print("Elapsed: {}".format(t))
             ExecValidator(block["validator"]).validate(cmd, out, err, proc.poll())
             # if proc.poll() > 0:
             #    msg = "Error executing " + cmd + ": "+ str(err) + " " + str(out)
