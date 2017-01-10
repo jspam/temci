@@ -518,6 +518,7 @@ class ExecRunDriver(AbstractRunDriver):
             #    raise BenchmarkingError(msg)
             return self.ExecResult(time=t, stderr=str(err), stdout=str(out))
         except:
+            print(err)
             if proc is not None:
                 try:
                     proc.terminate()
