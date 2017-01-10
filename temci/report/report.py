@@ -72,9 +72,10 @@ class AbstractReporter:
         """ Used starts helper """
         if stats_helper is None:
             runs = []
-            typecheck(Settings()["report/in"], ValidYamlFileName())
-            with open(Settings()["report/in"], "r") as f:
-                runs = yaml.load(f)
+            typecheck(Settings()["report/in"], ListOrTuple(ValidYamlFileName()))
+            for infile in Settings()["report/in"]:
+                with open(infile, "r") as f:
+                    runs.extend(yaml.load(f))
             self.stats_helper = RunDataStatsHelper.init_from_dicts(runs)
         else:
             self.stats_helper = stats_helper
