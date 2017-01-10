@@ -505,7 +505,7 @@ class ExecRunDriver(AbstractRunDriver):
             proc = subprocess.Popen(["/bin/sh", "-c", executed_cmd], stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     universal_newlines=True,
-                                    cwd=cwd,
+                                    cwd=os.path.expandvars(cwd),
                                     env=env, )
             # preexec_fn=os.setsid)
             out, err = proc.communicate()
