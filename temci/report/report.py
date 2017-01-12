@@ -45,7 +45,7 @@ class ReporterRegistry(AbstractRegistry):
     settings_key_path = "report"
     use_key = "reporter"
     use_list = False
-    default = "html2"
+    default = "console"
     registry = {}
     plugin_synonym = ("reporter", "reporter")
 
