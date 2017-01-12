@@ -66,6 +66,7 @@ class AbstractReporter:
         """
         FNumber.init_settings(Settings()["report/number"])
         excluded_properties = excluded_properties or Settings()["report/excluded_properties"]
+        propfilter = Settings()["report/propfilter"]
         self.misc = misc_settings
         """ Configuration """
         self.stats_helper = None  # type: RunDataStatsHelper
@@ -80,6 +81,7 @@ class AbstractReporter:
         else:
             self.stats_helper = stats_helper
         self.stats_helper = self.stats_helper.exclude_properties(excluded_properties)  # type: RunDataStatsHelper
+        self.stats_helper = self.stats_helper.filter_properties(propfilter)
         self.stats_helper.make_descriptions_distinct()
         self.excluded_data_info = ExcludedInvalidData()  # type: ExcludedInvalidData
         if Settings()["report/exclude_invalid"]:

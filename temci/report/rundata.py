@@ -12,6 +12,7 @@ from collections import defaultdict
 if util.can_import("scipy"):
     import scipy
 import typing as t
+import re
 
 
 Number = t.Union[int, float]
@@ -132,6 +133,19 @@ class RunData(object):
         data = {}
         for prop in self.data:
             if prop not in properties:
+                data[prop] = self.data[prop]
+        return self.clone(data=data)
+
+    def filter_properties(self, regex: str) -> 'RunData':
+        """
+        Creates a new run data instance without properties that do not contain a string matching the regex
+
+        :param properties: excluded properties
+        :return: new run data instance
+        """
+        data = {}
+        for prop in self.data:
+            if re.search(regex, prop) is not None:
                 data[prop] = self.data[prop]
         return self.clone(data=data)
 
@@ -512,6 +526,19 @@ class RunDataStatsHelper(object):
         for run in self.runs:
             if run is not None:
                 runs.append(run.exclude_properties(properties))
+        return self.clone(runs=runs)
+
+    def filter_properties(self, regex: str) -> 'RunDataStatsHelper':
+        """
+        Create a new instance without the properties that don't match the regex.
+
+        :param regex: filter regex
+        :return: new instance
+        """
+        runs = []
+        for run in self.runs:
+            if run is not None:
+                runs.append(run.filter_properties(regex))
         return self.clone(runs=runs)
 
     def exclude_invalid(self) -> t.Tuple['RunDataStatsHelper', 'ExcludedInvalidData']:

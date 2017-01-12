@@ -52,6 +52,8 @@ class Settings(metaclass=Singleton):
                     // CompletionHint(zsh=YAML_FILE_COMPLETION_HINT),
             "excluded_properties": ListOrTuple(Str()) // Default(["__ov-time"])
                     // Description("Properties that aren't shown in the report."),
+            "propfilter": Str() // Default("")
+                    // Description("Regular expression to filter reported properties."),
             "exclude_invalid": BoolOrNone() // Default(True)
                     // Description("Exclude all data sets that contain only zeros or NaNs."),
             "long_properties": BoolOrNone() // Default(True)
