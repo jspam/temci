@@ -124,7 +124,9 @@ class ConsoleReporter(AbstractReporter):
 
         print_func = string_printer if to_string else print
         with click.open_file(self.misc["out"], mode='w') as f:
-            for block in self.stats_helper.valid_runs():
+            valid_runs = self.stats_helper.valid_runs()
+            maxproplen = max(len(prop) for block in valid_runs for prop in block.properties)
+            for block in valid_runs:
                 assert isinstance(block, RunData)
                 print_func("{descr:<20} ({num:>5} single benchmarks)"
                       .format(descr=block.description(), num=len(block.data[block.properties[0]])), file=f)
@@ -132,34 +134,37 @@ class ConsoleReporter(AbstractReporter):
                     mean = np.mean(block[prop])
                     stdev = np.std(block[prop]) / mean
                     mean_str = str(FNumber(mean, rel_deviation=stdev))
-                    print_func("\t {prop:<18} mean = {mean:>15s}, deviation = {dev:>5.2%}".format(
+                    print_func("\t {prop:<{maxproplen}}: mean = {mean:>15s}, deviation = {dev:>5.2%}".format(
                         prop=prop, mean=mean_str,
-                        dev=stdev, dev_perc=stdev/mean
+                        dev=stdev, dev_perc=stdev/mean,
+                        maxproplen=maxproplen
                     ), file=f)
             if with_tester_results:
                 self._report_list("Equal program blocks",
                                   self.stats_helper.get_evaluation(with_equal=True,
                                                                    with_uncertain=False,
                                                                    with_unequal=False),
-                                  f, print_func)
+                                  f, print_func, maxproplen)
                 self._report_list("Unequal program blocks",
                                   self.stats_helper.get_evaluation(with_equal=False,
                                                                    with_uncertain=False,
                                                                    with_unequal=True),
-                                  f, print_func)
+                                  f, print_func, maxproplen)
                 self._report_list("Uncertain program blocks",
                                   self.stats_helper.get_evaluation(with_equal=True,
                                                                    with_uncertain=True,
                                                                    with_unequal=True),
-                                  f, print_func)
+                                  f, print_func, maxproplen)
         if to_string:
             return output[0]
 
-    def _report_list(self, title: str, list, file, print_func: t.Callable[[str, Any], None]):
+    def _report_list(self, title: str, list, file, print_func: t.Callable[[str, Any], None], maxdesclen):
         if len(list) != 0:
             print_func(title, file=file)
             print_func("####################", file=file)
-        for item in list:
+        for idx, item in enumerate(list):
+            if idx > 0 and list[idx-1]["data"][0].description() != item["data"][0].description():
+                print_func("")
             print_func("\t {} ⟷ {}".format(item["data"][0].description(),
                                        item["data"][1].description()), file=file)
             for prop in sorted(item["properties"]):
@@ -167,9 +172,9 @@ class ConsoleReporter(AbstractReporter):
                 perc = prop_data["p_val"]
                 if prop_data["unequal"]:
                     perc = 1 - perc
-                print_func("\t\t {descr:<18} probability = {perc:>10.0%}, speed up = {speed_up:>10.2%}"
+                print_func("\t\t {descr:<{maxdesclen}}: probability = {perc:>10.0%}, speed up = {speed_up:>10.2%}"
                       .format(descr=prop_data["description"], perc=perc,
-                              speed_up=prop_data["speed_up"]), file=file)
+                              speed_up=prop_data["speed_up"], maxdesclen=maxdesclen), file=file)
 
 
 @register(ReporterRegistry, "html", Dict({
