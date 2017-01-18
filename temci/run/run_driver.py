@@ -500,6 +500,7 @@ class ExecRunDriver(AbstractRunDriver):
         t = time.time()
         executed_cmd = "; ".join(executed_cmd)
         proc = None
+        out, err = "", ""
         try:
             print("{}Executing: {}".format(os.linesep, executed_cmd))
             proc = subprocess.Popen(["/bin/sh", "-c", executed_cmd], stdout=subprocess.PIPE,
