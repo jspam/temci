@@ -151,9 +151,9 @@ class ConsoleReporter(AbstractReporter):
                                                                    with_unequal=True),
                                   f, print_func, maxproplen)
                 self._report_list("Uncertain program blocks",
-                                  self.stats_helper.get_evaluation(with_equal=True,
+                                  self.stats_helper.get_evaluation(with_equal=False,
                                                                    with_uncertain=True,
-                                                                   with_unequal=True),
+                                                                   with_unequal=False),
                                   f, print_func, maxproplen)
         if to_string:
             return output[0]
